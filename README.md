@@ -1,2 +1,2 @@
 # javaproject
-使用java依据git底层原理实现的可以模仿部分git命令的版本控制工具
+模仿git的版本控制工具
