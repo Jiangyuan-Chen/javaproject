@@ -16,7 +16,7 @@ public class UnitTest1 {
             e1.printStackTrace();
         }
         try {
-            String s = "Congratulation!";
+            String s = "Congratulation on WriteFile()!";
             FileOutputStream outputStream = new FileOutputStream(intest);
             outputStream.write(s.getBytes()); // 向文件内写入字符串s的字节数组
             outputStream.close(); // 关闭输出流
@@ -25,12 +25,12 @@ public class UnitTest1 {
         }
 
         // 测试WriteFile()
-        KeyValueStore kvs1 = new KeyValueStore("ddd.txt", intest);
+        KeyValueStore kvs1 = new KeyValueStore(intest);
         kvs1.writeFile();
         System.out.println("WriteFile()执行成功");
 
         // 测试WriteString()
-        KeyValueStore kvs2 = new KeyValueStore("UnitTest1.txt", "Congratulation!");
+        KeyValueStore kvs2 = new KeyValueStore("Congratulation on WriteString()!");
         kvs2.writeString();
         System.out.println("WriteString()执行成功");
 

@@ -14,7 +14,7 @@ public class Blob extends GitObject{
     @Override
     // 生成文件到工作目录并哈希
     public void write() throws Exception {
-        new KeyValueStore(getName(), file).writeFile();
+        new KeyValueStore(file).writeFile();
     }
 
     public File getFile(){

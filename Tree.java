@@ -21,7 +21,7 @@ public class Tree extends GitObject{
     @Override
     // 在工作目录新建文件，value为输入的字符串，key为文本文档的哈希值
     public void write() throws Exception {
-        new KeyValueStore(getName(), value).writeString();
+        new KeyValueStore(value).writeString();
     }
 
     public String getValue(){

@@ -9,14 +9,14 @@ public class KeyValueStore {
     private File file;
     private String value;
 
-    public KeyValueStore(String name, File file) {
-        this.name = name;
+    public KeyValueStore(File file) throws Exception {
         this.file = file;
+        this.name = SHA1CheckSum.FileSHA1Checksum(file);
     }
 
-    public KeyValueStore(String name, String value) {
-        this.name = name;
+    public KeyValueStore(String value) throws Exception {
         this.value = value;
+        this.name = SHA1CheckSum.StringSHA1Checksum(value);
     }
 
 
