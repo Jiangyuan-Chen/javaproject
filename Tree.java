@@ -1,28 +1,27 @@
 import java.io.File;
-import java.io.FileOutputStream;
+import java.util.Objects;
 
 
-public class Tree {
-    private String name;
+public class Tree extends GitObject{
+
     private String value = "";
+
 
     public Tree(String filePath) throws Exception {
         File file = new File(filePath);
-        for (File x : file.listFiles()) {
+        for (File x : Objects.requireNonNull(file.listFiles())) {
             if (x.isDirectory())
                 value += "tree " + new Tree(filePath + File.separator + x.getName()).getName() + "\t" + x.getName() + "\n";
             if (x.isFile())
                 value += "Blob " + new Blob(filePath + File.separator + x.getName()).getName() + "\t" + x.getName() + "\n";
         }
-        name = SHA1CheckSum.StringSHA1Checksum(value);
+        setName(SHA1CheckSum.StringSHA1Checksum(value));
     }
 
-    public void writeTree() throws Exception {
-        new FileOutputStream(name).write(value.getBytes());
-    }
-
-    public String getName(){
-        return name;
+    @Override
+    // 在工作目录新建文件，value为输入的字符串，key为文本文档的哈希值
+    public void write() throws Exception {
+        new KeyValueStore(getName(), value).writeString();
     }
 
     public String getValue(){
