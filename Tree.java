@@ -1,31 +1,27 @@
 import java.io.File;
-import java.io.FileOutputStream;
+import java.util.Objects;
 
 
-public class Tree {
-    private String name;
-    private String value = "";
+public class Tree extends GitObject {
 
     public Tree(String filePath) throws Exception {
+
         File file = new File(filePath);
-        for (File x : file.listFiles()) {
-            if (x.isDirectory())
-                value += "tree " + new Tree(filePath + File.separator + x.getName()).getName() + "\t" + x.getName() + "\n";
-            if (x.isFile())
-                value += "Blob " + new Blob(filePath + File.separator + x.getName()).getName() + "\t" + x.getName() + "\n";
+        StringBuilder str = new StringBuilder();
+        for (File x : Objects.requireNonNull(file.listFiles())) {
+            if (x.isDirectory()) {
+                str.append("tree ").append(new Tree(filePath + File.separator + x.getName()).getName()).append("\t").append(x.getName()).append("\n");
+            }
+            if (x.isFile()) {
+                str.append("Blob ").append(new Blob(filePath + File.separator + x.getName()).getName()).append("\t").append(x.getName()).append("\n");
+            }
         }
-        name = SHA1CheckSum.StringSHA1Checksum(value);
+        setName(SHA1CheckSum.StringSHA1Checksum(getValue()));
+        setValue(str.toString());
     }
 
-    public void writeTree() throws Exception {
-        new FileOutputStream(name).write(value.getBytes());
-    }
-
-    public String getName(){
-        return name;
-    }
-
-    public String getValue(){
-        return value;
+    @Override
+    public void write() throws Exception {
+        new KeyValueStore(getValue()).writeString();
     }
 }

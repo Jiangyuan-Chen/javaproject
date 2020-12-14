@@ -1,22 +1,39 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Scanner;
 
 
 public class KeyValueStore {
+    private String name;
+    private File file;
+    private String value;
 
-    // 生成文件到工作目录并哈希
-    public void WriteFile(String sourceFile) throws Exception {
-        File file = new File(sourceFile);
+    public KeyValueStore(File file) throws Exception {
+        this.file = file;
+        this.name = SHA1CheckSum.FileSHA1Checksum(file);
+    }
+
+    public KeyValueStore(String value) throws Exception {
+        this.value = value;
+        this.name = SHA1CheckSum.StringSHA1Checksum(value);
+    }
+
+
+    /** 在工作目录新建文件，提取源文件的内容到新文件 */
+    public void writeFile() throws Exception {
+        // 生成名为文件哈希值的空文件并允许向value后面添加内容
+        FileOutputStream output = new FileOutputStream(new File(name), true);
         FileInputStream is = new FileInputStream(file);
-        FileOutputStream output = new FileOutputStream(SHA1CheckSum.FileSHA1Checksum(new FileInputStream(file)), true); // 生成名为文件哈希值的空文件并允许向value后面添加内容
         // 用于读文件的缓存区
         byte[] buffer = new byte[1024];
-        int numRead = 0;
+        int numRead;
         do {
-            numRead = is.read(buffer); // 读出numRead字节到buffer中
+            // 读出numRead字节到buffer中
+            numRead = is.read(buffer);
             if (numRead > 0) {
-                output.write(buffer); // 把buffer中的内容写入文件
+                // 把buffer中的内容写入文件
+                output.write(buffer);
             }
             // 文件已读写完，退出循环
         } while (numRead != -1);
@@ -25,79 +42,53 @@ public class KeyValueStore {
         output.close();
     }
 
-    // 在工作目录新建文件，value为输入的字符串，key为文本文档的哈希值
-    public void WriteString(String s) throws Exception {
-        new FileOutputStream(SHA1CheckSum.StringSHA1Checksum(s)).write(s.getBytes());
+    /** 在工作目录新建文件，value为文件的字符串，name为文件的名字 */
+    public void writeString() throws Exception {
+        new FileOutputStream(name).write(value.getBytes());
     }
 
-    // 给定key，在工作目录获得文件的value
+    /** 读取文件中的字符串 */
+    public static String readFileString(String filename) throws Exception {
+        FileInputStream is = new FileInputStream(filename);
+        byte[] buffer = new byte[40];
+        is.read(buffer);
+        is.close();
+        return new String(buffer);
+    }
+
+    /** 给定key，在指定目录获得文件的value */
     public String getValue(String key) throws Exception {
-        File dir = new File(System.getProperty("user.dir"));
-        File[] fs = dir.listFiles(); //将目录里的文件和文件夹对象放入数组fs
-        StringBuilder value = new StringBuilder();
-        //按顺序遍历每个对象的名字是否匹配key
-        if (fs == null) throw new AssertionError();
-        for (File f : fs) {
-            if (f.getName().equals(key)) {
-                FileInputStream is = new FileInputStream(f);
-                // 用于读文件的缓存区
-                byte[] buffer = new byte[1024];
-                int numRead = 0;
-                do {
-                    // 读出numRead字节到buffer中
-                    numRead = is.read(buffer);
-                    if (numRead > 0) {
-                        value.append(new String(buffer)); // 把buffer中的字节转换成字符串后再将其附加在value之后
-                    }
-                    // 文件已读完，退出循环
-                } while (numRead != -1);
-                // 关闭输入流
-                is.close();
-            }
-        }
-        return value.toString();
-    }
-
-    // 给定key，在指定目录获得文件的value
-    public String getValue(String key, String path) throws Exception {
+        System.out.print("请输入指定目录的路径：");
+        String path = new Scanner(System.in).next();
         File dir = new File(path);
-        File[] fs = dir.listFiles(); //将目录里的文件和文件夹对象放入数组fs
+        //将目录里的文件和文件夹对象放入数组fs
+        File[] fs = dir.listFiles();
         StringBuilder value = new StringBuilder();
         //按顺序遍历每个对象的名字是否匹配key
-        if (fs == null) throw new AssertionError();
+        assert fs != null;
+        if (fs.length == 0) {
+            return "指定路径内没有文件存在";
+        }
         for (File f : fs) {
             if (f.getName().equals(key)) {
                 FileInputStream is = new FileInputStream(f);
                 // 用于读文件的缓存区
                 byte[] buffer = new byte[1024];
-                int numRead = 0;
+                int numRead;
                 do {
                     // 读出numRead字节到buffer中
                     numRead = is.read(buffer);
                     if (numRead > 0) {
-                        value.append(new String(buffer));// 把buffer中的字节转换成字符串后再将其附加在value之后
+                        // 把buffer中的字节转换成字符串后再将其附加在value之后
+                        value.append(new String(buffer));
                     }
                     // 文件已读完，退出循环
                 } while (numRead != -1);
                 // 关闭输入流
                 is.close();
+                return value.toString();
             }
         }
-        return value.toString();
+        return "未发现文件：" + key;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
