@@ -67,7 +67,7 @@ Class Commit与class Blob和class Tree同样继承于abstract class GitObject，
 
  
 
-•     class KeyValueStore 
+•     Class KeyValueStore 
 
 \1.    writeFile()和writeString()方法：
 
@@ -83,7 +83,7 @@ Class Commit与class Blob和class Tree同样继承于abstract class GitObject，
 
  
 
-•     abstract class GitObject 
+•     Abstract class GitObject 
 
 \1.    数据域：name、value、file
 
@@ -91,7 +91,7 @@ Class Commit与class Blob和class Tree同样继承于abstract class GitObject，
 
  
 
-•     class Blob（extends GitObject）
+•     Class Blob（extends GitObject）
 
 \1.    构造方法：
 
@@ -103,7 +103,7 @@ Class Commit与class Blob和class Tree同样继承于abstract class GitObject，
 
  
 
-•     class Tree（extends GitObject）
+•     Class Tree（extends GitObject）
 
 \1.    构造方法：
 
@@ -117,7 +117,7 @@ Class Commit与class Blob和class Tree同样继承于abstract class GitObject，
 
  
 
-•     class Commit（extends GitObject）
+•     Class Commit（extends GitObject）
 
 \1.    构造方法：
 
@@ -136,3 +136,4 @@ Class Commit与class Blob和class Tree同样继承于abstract class GitObject，
 生成HEAD文件，内容为当前最新commit的哈希值。
 
 ------
+
