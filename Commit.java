@@ -26,23 +26,15 @@ public class Commit extends GitObject{
     @Override
     public void write() throws Exception {
         // 默认GitObjects存放在工作目录
-        File dir = new File(System.getProperty("user.dir"));
-        File[] fs = dir.listFiles();
         String newTreeKey = "";
-        for (File f : fs) {
             try {
                 // 最新commit的key
                 String HEAD = KeyValueStore.readFileString("HEAD");
-                if (HEAD.equals(f.getName())) {
-                    String value = KeyValueStore.readFileString(f.getName());
-                    String[] v = value.split(" |\n");
-                    newTreeKey = v[1];
-                    break;
-                }
-            } catch (FileNotFoundException e){
-                break;
-            }
-        }
+                // 取出最新commit上传的tree name
+                String value = KeyValueStore.readFileString(HEAD);
+                String[] v = value.split(" |\n");
+                newTreeKey = v[1];
+            } catch (FileNotFoundException ignored){}
         if (getFile().getName().equals(newTreeKey)){
             System.out.println("tree相同，commit生成失败");
         }
@@ -58,10 +50,3 @@ public class Commit extends GitObject{
         { outputStream.write(getName().getBytes()); }
     }
 }
-
-
-
-
-
-
-

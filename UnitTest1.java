@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 
@@ -37,7 +38,9 @@ public class UnitTest1 {
 
         // 测试getValue(String key)
         System.out.println("开始测试getValue(String key)");
-        String value = kvs1.getValue("UnitTest1.txt");
-        System.out.println(value);
+        String value = kvs2.getFileValue(kvs2.getName());
+        if (value.equals(kvs2.getValue())){
+            System.out.println("value正确，getValue(String key)执行成功");
+        }
     }
 }

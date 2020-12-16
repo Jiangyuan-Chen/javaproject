@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Scanner;
 
@@ -47,7 +48,7 @@ public class KeyValueStore {
         new FileOutputStream(name).write(value.getBytes());
     }
 
-    /** 读取文件中的字符串 */
+    /** 根据文件名自动查找到工作目录下的文件，并读取文件中的字符串 */
     public static String readFileString(String filename) throws Exception {
         FileInputStream is = new FileInputStream(filename);
         byte[] buffer = new byte[40];
@@ -57,38 +58,49 @@ public class KeyValueStore {
     }
 
     /** 给定key，在指定目录获得文件的value */
-    public String getValue(String key) throws Exception {
+    public String getFileValue(String key) throws Exception {
         System.out.print("请输入指定目录的路径：");
         String path = new Scanner(System.in).next();
-        File dir = new File(path);
-        //将目录里的文件和文件夹对象放入数组fs
-        File[] fs = dir.listFiles();
         StringBuilder value = new StringBuilder();
-        //按顺序遍历每个对象的名字是否匹配key
-        assert fs != null;
-        if (fs.length == 0) {
-            return "指定路径内没有文件存在";
+        // 在指定目录里找文件名字是否匹配key
+        try {
+            FileInputStream is = new FileInputStream(path + File.separator + key);
+            // 用于读文件的缓存区
+            byte[] buffer = new byte[1024];
+            int numRead;
+            do {
+                // 读出numRead字节到buffer中
+                numRead = is.read(buffer);
+                if (numRead == 1024) {
+                    // 把buffer中的字节转换成字符串后再将其附加在value之后
+                    value.append(new String(buffer));
+                }
+                else {
+                    try{
+                        byte[] newBuffer = new byte[numRead];
+                        System.arraycopy(buffer, 0, newBuffer, 0, numRead);
+                        value.append(new String(newBuffer));
+                    } catch (NegativeArraySizeException ignored) {}
+                }
+                // 文件已读完，退出循环
+            } while (numRead != -1);
+            // 关闭输入流
+            is.close();
+        } catch (FileNotFoundException e) {
+            return "未发现文件：" + key;
         }
-        for (File f : fs) {
-            if (f.getName().equals(key)) {
-                FileInputStream is = new FileInputStream(f);
-                // 用于读文件的缓存区
-                byte[] buffer = new byte[1024];
-                int numRead;
-                do {
-                    // 读出numRead字节到buffer中
-                    numRead = is.read(buffer);
-                    if (numRead > 0) {
-                        // 把buffer中的字节转换成字符串后再将其附加在value之后
-                        value.append(new String(buffer));
-                    }
-                    // 文件已读完，退出循环
-                } while (numRead != -1);
-                // 关闭输入流
-                is.close();
-                return value.toString();
-            }
-        }
-        return "未发现文件：" + key;
+        return value.toString();
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public File getFile(){
+        return file;
+    }
+
+    public String getValue(){
+        return value;
     }
 }
