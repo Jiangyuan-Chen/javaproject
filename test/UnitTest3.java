@@ -10,7 +10,7 @@ public class UnitTest3 {
          * 最后一个File对象是为了检验能否不生成相同的commit
          */
         File[] filedir = {test.getParentFile().getParentFile(), test.getParentFile(), test, test};
-        for (File f : filedir){
+        for (File f : filedir) {
             String newCommit = "";
             Commit c = new Commit(f.getAbsolutePath());
             // 分割commit的value

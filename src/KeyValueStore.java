@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.BufferedInputStream;
 import java.util.Scanner;
 
 
@@ -18,6 +19,11 @@ public class KeyValueStore {
     public KeyValueStore(String value) throws Exception {
         this.value = value;
         this.name = SHA1CheckSum.StringSHA1Checksum(value);
+    }
+
+    public KeyValueStore(String name, String value) {
+        this.value = value;
+        this.name = name;
     }
 
 
@@ -48,13 +54,33 @@ public class KeyValueStore {
         new FileOutputStream(name).write(value.getBytes());
     }
 
+    /** 在指定目录新建文件，value为文件的字符串，name为文件的名字
+     * 想在指定目录写文件，但还没理清思路
+     */
+    public void writeString(File path) throws Exception {
+        File file = new File(path, name);
+        if (file.exists()) {
+            new FileOutputStream(file).write(value.getBytes());
+        }
+        else {
+            System.out.println("File不存在，失败");
+        }
+    }
+
+    /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */
+    public void writeBranch() throws Exception {
+        new FileOutputStream(new File("Branch").getAbsolutePath() + File.separator + name).write(value.getBytes());
+    }
+
     /** 根据文件名自动查找到工作目录下的文件，并读取文件中的字符串 */
     public static String readFileString(String filename) throws Exception {
-        FileInputStream is = new FileInputStream(filename);
-        byte[] buffer = new byte[40];
-        is.read(buffer);
+        BufferedInputStream is = new BufferedInputStream(new FileInputStream(filename));
+        byte[] buffer = new byte[1024];
+        int numRead = is.read(buffer);
         is.close();
-        return new String(buffer);
+        // String() 这个方法里的参数 (0，numRead) 十分重要！！可以把数组后面的null去掉！！
+        // 浪费了我一天半的时间 = =
+        return new String(buffer, 0, numRead);
     }
 
     /** 给定key，在指定目录获得文件的value */

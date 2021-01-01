@@ -18,6 +18,7 @@ public abstract class GitObject {
     public void setFile(File file) {
         this.file = file;
     }
+
     public String getName(){
         return name;
     }

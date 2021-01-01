@@ -41,6 +41,7 @@ public class Commit extends GitObject{
         else {
             new KeyValueStore(getValue()).writeString();
             writeHEAD();
+            new KeyValueStore(KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD"), getName()).writeString(new File("Branch"));
         }
     }
 
