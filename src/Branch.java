@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -28,11 +29,14 @@ public class Branch extends GitObject{
         try (FileOutputStream outputStreamHEAD = new FileOutputStream(new File("Branch").getAbsolutePath() + File.separator + "HEAD")) {
              outputStreamHEAD.write(getName().getBytes());
         }
-        // 新建该分支存储工作区文件的文件夹，文件夹名为该分支的名字
-        new File(new File("Branch").getAbsolutePath() + File.separator + getName() + "Files").mkdir();
+        // 新建该分支存储Commit的文件夹，文件夹名为该分支的名字+Commits，文件内容为Object Commit和commit files
+        new File(new File("Branch").getAbsolutePath() + File.separator + getName() + "Commits").mkdir();
+        new File(new File("Branch").getAbsolutePath() + File.separator + getName() + "Commits" + File.separator + "CommitFiles").mkdir();
     }
 
+    // 切换分支
     public static void switchBranch(String Branch) throws Exception {
+        // 把工作区的文件写到Branch里存放当前分支工作区文件的文件夹内
         new Tree("../workspace").writeTreeFiles("../workspace");
         // 获取当前所在分支名
         String beforeBranch = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD");
@@ -48,12 +52,28 @@ public class Branch extends GitObject{
         // 不一样时才更新工作区
         if (!beforeTree.getName().equals(afterTree.getName())) {
             deleteFiles(new File("../workspace"));
-            new File("../workspace").mkdir();
-
-
+            String workspace = "../workspace";
+            new File(workspace).mkdir();
+            String path = new File("Branch").getAbsolutePath() + File.separator + afterBranch + "Files";
+            rewriteBranchFiles(afterTree, workspace, path);
         }
     }
 
+    public static void rewriteBranchFiles(Tree afterTree, String workspace, String path) throws Exception {
+        // 把切换后分支的文件内容写进工作区
+        String[] v = afterTree.getValue().split(" |\n|\t");
+        File[] file = new File(path).listFiles();
+        for (int i = 0; i < file.length; i++) {
+            if ("Blob".equals(v[3*i])) {
+                new KeyValueStore(v[3*i+2],file[i]).writeFile(new File(workspace));
+            }
+            if ("Tree".equals(v[3*i])) {
+                new File(path, v[3*i+2]).mkdir();
+                path +=  File.separator + v[3*i+2];
+                rewriteBranchFiles(afterTree, workspace + File.separator + v[3*i+2], path);
+            }
+        }
+    }
 
     public static void deleteFiles(File file){
         if (file.isDirectory()) {

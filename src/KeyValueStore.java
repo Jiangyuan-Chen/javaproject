@@ -16,6 +16,11 @@ public class KeyValueStore {
         this.name = SHA1CheckSum.FileSHA1Checksum(file);
     }
 
+    public KeyValueStore(String name, File file) {
+        this.file = file;
+        this.name = name;
+    }
+
     public KeyValueStore(String value) throws Exception {
         this.value = value;
         this.name = SHA1CheckSum.StringSHA1Checksum(value);
@@ -80,12 +85,7 @@ public class KeyValueStore {
     /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */
     public void writeString(File path) throws Exception {
         File file = new File(path, name);
-        if (file.exists()) {
-            new FileOutputStream(file).write(value.getBytes());
-        }
-        else {
-            System.out.println("File不存在，失败");
-        }
+        new FileOutputStream(file).write(value.getBytes());
     }
 
     /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */

@@ -37,14 +37,23 @@ public class Commit extends GitObject{
                 String[] v = value.split(" |\n");
                 newTreeKey = v[1];
             } catch (FileNotFoundException ignored){}
-        if (workTree.getName().equals(newTreeKey)){
+        if (workTree.getName().equals(newTreeKey)) {
             System.out.println("tree相同，commit生成失败");
         }
         else {
-            new KeyValueStore(getValue()).writeString();
+            new KeyValueStore(getValue()).writeString(new File(new File("Branch").getAbsolutePath() + File.separator + getName() + "Commits"));
             writeHEAD();
             new KeyValueStore(KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD"), getName()).writeString(new File("Branch"));
+
+
+
+
+
+
+
         }
+
+
     }
 
     public void setWorkTree(Tree workTree) {

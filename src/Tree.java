@@ -26,6 +26,11 @@ public class Tree extends GitObject {
         new KeyValueStore(getValue()).writeString();
     }
 
+    public void write(File path) throws Exception {
+        new KeyValueStore(getValue()).writeString(path);
+    }
+
+    // 把工作区的文件写到Branch里存放当前分支工作区文件的文件夹内
     public void writeTreeFiles(String path) throws Exception {
         // 获取当前所在分支名
         String branch = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD");
@@ -33,6 +38,7 @@ public class Tree extends GitObject {
         for (File x : Objects.requireNonNull(new File(path).listFiles())) {
             // 遇到文件夹时递归进入遍历
             if (x.isDirectory()) {
+                new Tree(x.getAbsolutePath()).write(new File(new File("Branch").getAbsolutePath() + File.separator + branch + "Files"));
                 writeTreeFiles(path + File.separator + x.getName());
             }
             // 把文件写到Branch里存放当前分支工作区文件的文件夹内
