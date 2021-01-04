@@ -20,6 +20,10 @@ public class Branch extends GitObject{
         if (!obj.exists()){
             obj.mkdir();
         }
+        File workspace = new File("../workspace");
+        if (!workspace.exists()){
+            workspace.mkdir();
+        }
     }
 
 
@@ -66,11 +70,7 @@ public class Branch extends GitObject{
             }
             if ("Tree".equals(v[3*i])) {
                 new File(path, v[3*i+2]).mkdir();
-                path += File.separator + v[3*i+2];
-                //String insideTreeValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + v[3*i+1]);
-                //String[] value = insideTreeValue.split(" |\n|\t");
-                treeKey = v[3*i+1];
-                rewriteBranchFiles(treePath, treeKey, path);
+                rewriteBranchFiles(treePath, v[3*i+1], path + File.separator + v[3*i+2]);
             }
         }
     }

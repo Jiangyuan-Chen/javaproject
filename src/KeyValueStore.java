@@ -101,7 +101,9 @@ public class KeyValueStore {
         is.close();
         // String() 这个方法里的参数 (0，numRead) 十分重要！！可以把数组后面的null去掉！！
         // 浪费了我一天半的时间 = =
-        return new String(buffer, 0, numRead);
+        // 如果blob或者tree的value为空时，numRead = -1 会报错，因此需要catch一下返回空字符串
+        try {return new String(buffer, 0, numRead);}
+        catch (StringIndexOutOfBoundsException e) {return "";}
     }
 
     /** 给定key，在指定目录获得文件的value */
