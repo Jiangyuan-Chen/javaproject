@@ -49,14 +49,35 @@ public class KeyValueStore {
         output.close();
     }
 
+    /** 在指定目录新建文件，提取源文件的内容到新文件 */
+    public void writeFile(File path) throws Exception {
+        // 生成名为文件哈希值的空文件并允许向value后面添加内容
+        File f = new File(path, name);
+        FileOutputStream output = new FileOutputStream(f, true);
+        FileInputStream is = new FileInputStream(file);
+        // 用于读文件的缓存区
+        byte[] buffer = new byte[1024];
+        int numRead;
+        do {
+            // 读出numRead字节到buffer中
+            numRead = is.read(buffer);
+            if (numRead > 0) {
+                // 把buffer中的内容写入文件
+                output.write(buffer);
+            }
+            // 文件已读写完，退出循环
+        } while (numRead != -1);
+        // 关闭输入输出流
+        is.close();
+        output.close();
+    }
+
     /** 在工作目录新建文件，value为文件的字符串，name为文件的名字 */
     public void writeString() throws Exception {
         new FileOutputStream(name).write(value.getBytes());
     }
 
-    /** 在指定目录新建文件，value为文件的字符串，name为文件的名字
-     * 想在指定目录写文件，但还没理清思路
-     */
+    /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */
     public void writeString(File path) throws Exception {
         File file = new File(path, name);
         if (file.exists()) {

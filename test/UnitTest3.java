@@ -12,7 +12,7 @@ public class UnitTest3 {
         File[] filedir = {test.getParentFile().getParentFile(), test.getParentFile(), test, test};
         for (File f : filedir) {
             String newCommit = "";
-            Commit c = new Commit(f.getAbsolutePath());
+            Commit c = new Commit();
             // 分割commit的value
             String[] v = c.getValue().split(" |\n");
             // 获取当前commit的根目录名字

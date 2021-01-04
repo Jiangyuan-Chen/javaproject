@@ -12,4 +12,8 @@ public class Blob extends GitObject{
     public void write() throws Exception {
         new KeyValueStore(getFile()).writeFile();
     }
+
+    public void write(File path) throws Exception {
+        new KeyValueStore(getFile()).writeFile(path);
+    }
 }
