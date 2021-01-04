@@ -13,10 +13,10 @@ public class Commit extends GitObject{
         // HEAD存在时即不是第一次commit
         try {
             String HEAD = KeyValueStore.readFileString("HEAD");
-            str = "tree " + workTree.getName() + "\n" + "parent " + HEAD;
+            str = "Tree " + workTree.getName() + "\n" + "Parent " + HEAD;
         } // HEAD不存在即第一次commit
         catch (FileNotFoundException e){
-            str = "tree " + workTree.getName();
+            str = "Tree " + workTree.getName();
         } // 设置commit的value和name
         finally {
             setValue(str);
@@ -41,16 +41,16 @@ public class Commit extends GitObject{
             System.out.println("tree相同，commit生成失败");
         }
         else {
-            new KeyValueStore(getValue()).writeString(new File(new File("Branch").getAbsolutePath() + File.separator + getName() + "Commits"));
+            // 在文件夹Objects里存储本次commit的信息文件
+            new KeyValueStore(getValue()).writeString(new File("Objects"));
+            // 在文件夹Objects里存储本次commit工作区的tree
+            new Tree("../workspace").write(new File("Objects"));
+            // 更新工作目录里HEAD的指针，令其存储本次最新的commit key
             writeHEAD();
+            // 更新文件夹Branch里当前分支的指针，令其存储本次最新的commit key
             new KeyValueStore(KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD"), getName()).writeString(new File("Branch"));
-
-
-
-
-
-
-
+            // 把工作区的文件转化为Blob和Tree存入文件夹Objects
+            new Tree("../workspace").writeTreeFiles("../workspace");
         }
 
 
