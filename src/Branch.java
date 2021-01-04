@@ -1,10 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.lang.reflect.Field;
-import java.security.Key;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 
 public class Branch extends GitObject{
 
@@ -55,10 +55,9 @@ public class Branch extends GitObject{
         deleteFiles(new File("../workspace"));
         new File("../workspace").mkdir();
         rewriteBranchFiles(treePath, treeKey, "../workspace");
-
     }
 
-    public static void rewriteBranchFiles(String treePath, String treeKey, String path) throws Exception {
+    private static void rewriteBranchFiles(String treePath, String treeKey, String path) throws Exception {
         // 把切换后分支的文件内容写进工作区
         String treeValue = KeyValueStore.readFileString(treePath + File.separator + treeKey);
         String[] v = treeValue.split(" |\n|\t");
@@ -75,7 +74,7 @@ public class Branch extends GitObject{
         }
     }
 
-    public static void deleteFiles(File file){
+    private static void deleteFiles(File file){
         if (file.isDirectory()) {
             File[] files=file.listFiles();
             assert files != null;
@@ -88,5 +87,37 @@ public class Branch extends GitObject{
             }
         }
         file.delete();
+    }
+
+    public static LinkedList commitList() throws Exception {
+        LinkedList commitList = new LinkedList<String>();
+        String branch = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD");
+        String newCommitKey = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + branch);
+        commitList.addLast(newCommitKey);
+        generateCommitList(commitList, newCommitKey);
+
+        for (Object o : commitList) {
+            System.out.println(o);
+        }
+        return commitList;
+    }
+
+    private static void generateCommitList(LinkedList commitList, String newCommitKey) throws Exception {
+        String commitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + newCommitKey);
+        String[] v = commitValue.split(" |\n");
+        try {
+            commitList.add(v[3]);
+            generateCommitList(commitList, v[3]);
+        } catch (Exception ignored) {}
+    }
+
+    public static void resetVersion(String commitKey) throws Exception {
+        String commitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + commitKey);
+        String[] v = commitValue.split(" |\n");
+        String treeKey = v[1];
+        final String treePath = new File("Objects").getAbsolutePath();
+        deleteFiles(new File("../workspace"));
+        new File("../workspace").mkdir();
+        rewriteBranchFiles(treePath, treeKey, "../workspace");
     }
 }
