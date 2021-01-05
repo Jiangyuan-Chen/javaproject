@@ -51,6 +51,12 @@ public class Commit extends GitObject{
             new KeyValueStore(KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD"), getName()).writeString(new File("Branch"));
             // 把工作区的文件转化为Blob和Tree存入文件夹Objects
             new Tree("../workspace").writeTreeFiles("../workspace");
+            // 把本次commit的key写入当前分支的CommitHistory里
+            String branch = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "HEAD");
+            File totalCommitKey = new File(new File("Branch").getAbsolutePath() + File.separator + branch + "CommitHistory");
+            try (FileOutputStream outputStream = new FileOutputStream(totalCommitKey, true)){
+                outputStream.write((getName() + "\n").getBytes());
+            }
         }
 
 
@@ -64,7 +70,9 @@ public class Commit extends GitObject{
         return workTree;
     }
 
-    /** 存放最新commit的key */
+    /**
+     * 存放最新commit的key
+     */
     private void writeHEAD() throws Exception {
         try (FileOutputStream outputStream = new FileOutputStream("HEAD"))
         { outputStream.write(getName().getBytes()); }

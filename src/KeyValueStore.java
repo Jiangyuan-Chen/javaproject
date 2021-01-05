@@ -79,18 +79,24 @@ public class KeyValueStore {
 
     /** 在工作目录新建文件，value为文件的字符串，name为文件的名字 */
     public void writeString() throws Exception {
-        new FileOutputStream(name).write(value.getBytes());
+        try(FileOutputStream outputStream = new FileOutputStream(name)){
+            outputStream.write(value.getBytes());
+        }
     }
 
     /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */
     public void writeString(File path) throws Exception {
         File file = new File(path, name);
-        new FileOutputStream(file).write(value.getBytes());
+        try(FileOutputStream outputStream = new FileOutputStream(file)){
+            outputStream.write(value.getBytes());
+        }
     }
 
     /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */
     public void writeBranch() throws Exception {
-        new FileOutputStream(new File("Branch").getAbsolutePath() + File.separator + name).write(value.getBytes());
+        try(FileOutputStream outputStream = new FileOutputStream(new File("Branch").getAbsolutePath() + File.separator + name)){
+        outputStream.write(value.getBytes());
+        }
     }
 
     /** 根据文件名自动查找到工作目录下的文件，并读取文件中的字符串 */
