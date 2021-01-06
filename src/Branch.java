@@ -1,10 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 
 public class Branch extends GitObject{
@@ -38,8 +36,10 @@ public class Branch extends GitObject{
             String totalBranches = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "Branch List.txt");
             // 如果新建的分支名是否和已创建的分支名重合，则不创建新分支
             if (totalBranches.contains(getName())){
+                System.out.println("分支已存在！");
                 return;
             }
+            System.out.println("分支已成功创建！");
         }catch (FileNotFoundException ignored){}
 
 
@@ -61,7 +61,7 @@ public class Branch extends GitObject{
                 String branchCommitKey = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + branch);
                 // 如果切换前的分支有提交过commit，则把这些记录写入新分支的记录中
                 if (!"None".equals(branchCommitKey)){
-                    outputStream.write(branchCommitKey.getBytes());
+                    outputStream.write((branchCommitKey + "/n").getBytes());
                 }
             } catch (FileNotFoundException ignored){}
         }
@@ -110,15 +110,17 @@ public class Branch extends GitObject{
      * @throws Exception readFileString()可能会抛出FileNotFoundException
      */
     private static void rewriteBranchFiles(String treePath, String treeKey, String path) throws Exception {
-
+        // 根目录的tree key
         String treeValue = KeyValueStore.readFileString(treePath + File.separator + treeKey);
         String[] v = treeValue.split(" |\n|\t");
-
+        //判断key对应的Object类型并写出文件
         for (int i = 0; i < v.length/3; i++) {
+            // 如果是Blob直接写出
             if ("Blob".equals(v[3*i])) {
                 File blob = new File(new File("Objects").getAbsolutePath() + File.separator + v[3*i+1]);
                 new KeyValueStore(v[3*i+2], blob).writeFile(new File(path));
             }
+            // 如果是Tree则先写出文件夹再递归进入这个文件夹写文件夹或文件
             if ("Tree".equals(v[3*i])) {
                 new File(path, v[3*i+2]).mkdir();
                 rewriteBranchFiles(treePath, v[3*i+1], path + File.separator + v[3*i+2]);
@@ -129,7 +131,7 @@ public class Branch extends GitObject{
     /**
      * 递归删除整个指定的文件夹
      *
-     * @param file
+     * @param file 要删除的文件夹File
      */
     private static void deleteFiles(File file){
         if (file.isDirectory()) {
@@ -170,7 +172,7 @@ public class Branch extends GitObject{
      *
      * @param commitList 存放commit历史记录的LinkedList
      * @param newCommitKey 递归下去的commit key
-     * @throws Exception readFileString()可能会抛出FileNotFoundException
+     * @throws Exception readFileString()可能会抛出FileNotFoundException；当到最开始的commit时v[3]越界会抛出ArrayIndexOutOfBoundsException
      */
     private static void generateCommitList(LinkedList commitList, String newCommitKey) throws Exception {
         String commitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + newCommitKey);
@@ -204,23 +206,90 @@ public class Branch extends GitObject{
         String commitHistory = KeyValueStore.readFileString(path);
         // 获取回退版本的 commit key 所在的位置
         int index = commitHistory.indexOf(commitKey);
-        String newCommitHistory = commitHistory.substring(0, index);
+        String newCommitHistory = commitHistory.substring(0, index + commitKey.length());
         // 把截取好的commit历史重新写进Commit History
         try(FileOutputStream outputStream = new FileOutputStream(path)){
-            outputStream.write(newCommitHistory.getBytes());
+            outputStream.write((newCommitHistory + "\n").getBytes());
         }
 
         // 删除未被引用的Objects
+        String[] branchList = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "Branch List.txt").split("\n");
+        String tempCommit = "";
+        for (int i = 0; i < branchList.length; i++){
+            String tempCommitHistory = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + branchList[i] + "CommitHistory");
+            tempCommit += tempCommitHistory;
+        }
 
+        ArrayList<String> tempObjectName = new ArrayList<>();
+        String[] tempCommitList = tempCommit.split("\n");
+        for (int i = 0; i < tempCommitList.length; i++){
+            // 被回滚的tempCommit里的value
+            String tempCommitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + tempCommitList[i]);
+            String[] tempValue = tempCommitValue.split(" |\n");
+            // 获得被回滚的tempCommit里根目录的key
+            String tempTreeKey = tempValue[1];
+            findCommitFiles(treePath, tempTreeKey, tempObjectName);
+        }
 
+        // 被删除的Commit History
+        String oldCommitHistory = commitHistory.substring(index + 40 + 1);
+        String[] oldCommitList = oldCommitHistory.split("\n");
+        for (int j = 0; j < oldCommitList.length; j++){
+            if (!tempCommit.contains(oldCommitList[j])) {
+                // 被回滚的oldCommit里的value
+                String oldCommitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + oldCommitList[j]);
+                String[] value = oldCommitValue.split(" |\n");
+                // 获得被回滚的oldCommit里根目录的key
+                String oldTreeKey = value[1];
+                File commit = new File(new File("Objects").getAbsolutePath() + File.separator + oldCommitList[j]);
+                commit.delete();
+                deleteCommitFiles(treePath, oldTreeKey, tempObjectName);
 
+            }
+        }
+        // 更新文件夹Branch里当前分支的指针，令其指向本次最新的commit key
+        try (FileOutputStream outputStream = new FileOutputStream(new File("Branch").getAbsolutePath() + File.separator + branch))
+        { outputStream.write(commitKey.getBytes()); }
+    }
 
+    private static void deleteCommitFiles(String treePath, String oldTreeKey, ArrayList<String> tempObjectName) throws Exception {
+        try{
+            String treeValue = KeyValueStore.readFileString(treePath + File.separator + oldTreeKey);
+            String[] vtree = treeValue.split(" |\n|\t");
+            File t = new File(new File("Objects").getAbsolutePath() + File.separator + oldTreeKey);
+            t.delete();
+            // 判断key对应的Object类型并删除
+            for (int i = 0; i < vtree.length/3; i++) {
+                // 如果是Blob且这个Blob未被引用，则直接删除
+                if (!tempObjectName.contains(vtree[3*i+1]) && "Blob".equals(vtree[3*i])) {
+                    File blob = new File(new File("Objects").getAbsolutePath() + File.separator + vtree[3*i+1]);
+                    blob.delete();
+                }
+                // 如果是Tree且这个Tree未被引用则先删除这个tree再递归进这个tree key
+                if (!tempObjectName.contains(vtree[3*i+1]) && "Tree".equals(vtree[3*i])) {
+                    deleteCommitFiles(treePath, vtree[3*i+1], tempObjectName);
+                }
+            }
+        }catch (FileNotFoundException ignored){}
+    }
 
-
-
-
-
-
-
+    private static void findCommitFiles(String treePath, String tempTreeKey, ArrayList<String> tempObjectName) throws Exception {
+        try{
+            String treeValue = KeyValueStore.readFileString(treePath + File.separator + tempTreeKey);
+            String[] vtree = treeValue.split(" |\n|\t");
+            // 判断key对应的Object类型并添加名字到tempObjectName
+            for (int i = 0; i < vtree.length/3; i++) {
+                // 如果是Blob直接添加它的名字到tempObjectName
+                if ("Blob".equals(vtree[3*i])) {
+                    tempObjectName.add(vtree[3*i+1]);
+                    continue;
+                }
+                // 如果是Tree则添加名字到tempObjectName，再递归进这个tree key
+                if ("Tree".equals(vtree[3*i])) {
+                    tempObjectName.add(vtree[3*i+1]);
+                    findCommitFiles(treePath, vtree[3*i+1], tempObjectName);
+                }
+            }
+        }catch (FileNotFoundException ignored){}
     }
 }

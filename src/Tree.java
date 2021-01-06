@@ -32,18 +32,34 @@ public class Tree extends GitObject {
 
     // 把文件转化为Blob和Tree存入文件夹Objects
     public void writeTreeFiles(String path) throws Exception {
+        // 获得文件夹Object里所有objects的名字
         File[] file = new File("Objects").listFiles();
+        String[] objectsName =new String[file.length];
+        for (int q = 0; q < objectsName.length; q++){
+            objectsName[q] = file[q].getName();
+        }
+        File[] workspaceFiles= new File(path).listFiles();
+        String[] fileSHA1 = new String[workspaceFiles.length];
+        for (int i = 0; i < workspaceFiles.length; i++){
+            if (workspaceFiles[i].isFile()){
+                fileSHA1[i] = SHA1CheckSum.FileSHA1Checksum(workspaceFiles[i]);
+            }
+            else {
+                fileSHA1[i] = new Tree(workspaceFiles[i].getAbsolutePath()).getName();
+            }
+        }
+
         // 递归遍历工作区里的内容并转化为blob和tree保存起来
-        for (File x : Objects.requireNonNull(new File(path).listFiles())) {
-            if (!Arrays.asList(file).contains(x)){
-                // 遇到文件夹时递归进入遍历
-                if (x.isDirectory()) {
-                    new Tree(x.getAbsolutePath()).write(new File("Objects"));
-                    writeTreeFiles(path + File.separator + x.getName());
+        for (int j = 0; j < fileSHA1.length; j++) {
+            if (!Arrays.asList(objectsName).contains(fileSHA1[j])){
+                // 遇到文件夹时先把它转换成tree并写入文件夹Object里，然后递归进入遍历
+                if (workspaceFiles[j].isDirectory()) {
+                    new Tree(workspaceFiles[j].getAbsolutePath()).write(new File("Objects"));
+                    writeTreeFiles(path + File.separator + workspaceFiles[j].getName());
                 }
-                // 把文件写到Branch里存放当前分支工作区文件的文件夹内
-                if (x.isFile()) {
-                    new Blob(x.getAbsolutePath()).write(new File("Objects"));
+                // 遇到文件就把它转换成blob并写入文件夹Object里
+                if (workspaceFiles[j].isFile()) {
+                    new Blob(workspaceFiles[j].getAbsolutePath()).write(new File("Objects"));
                 }
             }
         }

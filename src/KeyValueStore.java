@@ -92,7 +92,7 @@ public class KeyValueStore {
         }
     }
 
-    /** 在指定目录新建文件，value为文件的字符串，name为文件的名字 */
+    /** 在文件夹Branch里新建分支文件，文件名为创建的分支名，内容为当前分支最新的commit key */
     public void writeBranch() throws Exception {
         try(FileOutputStream outputStream = new FileOutputStream(new File("Branch").getAbsolutePath() + File.separator + name)){
         outputStream.write(value.getBytes());

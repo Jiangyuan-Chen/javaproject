@@ -9,7 +9,7 @@ public class test {
         //Branch.switchBranch("test");
         //Branch.commitList();
         //Branch.resetVersion("27fdf796db8d941206e4af327884f7104c13c0ee");
-        //Branch.resetVersion("cbff43cdc226297f0983519d4a50c39611f20e07");
+        Branch.resetVersion("c0bc07757fd46f11d46f7260dbe140de2c7e49c3");
 
         System.out.println("成功");
     }
