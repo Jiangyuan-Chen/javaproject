@@ -39,7 +39,6 @@ public class Branch extends GitObject{
                 System.out.println("分支已存在！");
                 return;
             }
-            System.out.println("分支已成功创建！");
         }catch (FileNotFoundException ignored){}
 
 
@@ -86,16 +85,19 @@ public class Branch extends GitObject{
         // 切换后分支最新的commit key
         String branchCommitKey = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + Branch);
         // 切换后分支最新的commit里的value
-        String commitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + branchCommitKey);
-        String[] v = commitValue.split(" |\n");
-        // 获得切换后分支最新的commit里根目录的key
-        String treeKey = v[1];
-        final String treePath = new File("Objects").getAbsolutePath();
-        // 删除工作目录后再重新创建
-        deleteFiles(new File("../workspace"));
-        new File("../workspace").mkdir();
-        // 把切换后分支的文件内容递归写进工作区
-        rewriteBranchFiles(treePath, treeKey, "../workspace");
+        String commitValue = "";
+        try{
+            commitValue = KeyValueStore.readFileString(new File("Objects").getAbsolutePath() + File.separator + branchCommitKey);
+            String[] v = commitValue.split(" |\n");
+            // 获得切换后分支最新的commit里根目录的key
+            String treeKey = v[1];
+            final String treePath = new File("Objects").getAbsolutePath();
+            // 删除工作目录后再重新创建
+            deleteFiles(new File("../workspace"));
+            new File("../workspace").mkdir();
+            // 把切换后分支的文件内容递归写进工作区
+            rewriteBranchFiles(treePath, treeKey, "../workspace");
+        } catch (FileNotFoundException ignored){}
         // 更新工作目录里HEAD的指针，令其指向本次最新的commit key
         try (FileOutputStream outputStream = new FileOutputStream("HEAD"))
         { outputStream.write(branchCommitKey.getBytes()); }
@@ -244,7 +246,6 @@ public class Branch extends GitObject{
                 File commit = new File(new File("Objects").getAbsolutePath() + File.separator + oldCommitList[j]);
                 commit.delete();
                 deleteCommitFiles(treePath, oldTreeKey, tempObjectName);
-
             }
         }
         // 更新文件夹Branch里当前分支的指针，令其指向本次最新的commit key
