@@ -125,7 +125,7 @@
     - 把工作区的文件转化为Blob和Tree存入文件夹Objects
     - 把本次commit的key写入当前分支的CommitHistory里
 
-  - ##### writeHEAD方法：
+  - ##### writeHEAD()方法：
 
     - 生成HEAD文件，内容为当前最新commit的key
 
