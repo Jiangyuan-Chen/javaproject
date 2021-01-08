@@ -10,18 +10,40 @@ import java.io.IOException;
 public class UnitTest_resetVersion {
 
     //目标路径
-    public static String target = "/Users/chenjiangyuan/软工课程资料/Java/作业/github/workspace";
+    public static String target = "../workspace";
 
     public static void main(String[] args) throws Exception {
+        new File("../ddd").mkdir();
+        new File("../ddd" + File.separator + "ddd.txt").createNewFile();
+        try(FileOutputStream outputStream = new FileOutputStream(new File("../ddd" + File.separator + "ddd.txt"))){outputStream.write("ddd".getBytes());}
+        new File("../eee").mkdir();
+        try(FileOutputStream outputStream = new FileOutputStream(new File("../eee" + File.separator + "eee.txt"))){outputStream.write("eee".getBytes());}
+        new File("../fff").mkdir();
+        try(FileOutputStream outputStream = new FileOutputStream(new File("../fff" + File.separator + "fff.txt"))){outputStream.write("fff".getBytes());}
+
         new Branch("main").write();
-        Clone("/Users/chenjiangyuan/软工课程资料/Java/作业/github/aaa");
+        Clone("../ddd");
         new Commit().write();
-        Clone("/Users/chenjiangyuan/软工课程资料/Java/作业/github/bbb");
+        new Branch("test").write();
+        Branch.switchBranch("test");
+        Clone("../eee");
         new Commit().write();
-        Clone("/Users/chenjiangyuan/软工课程资料/Java/作业/github/ccc");
+        Clone("../fff");
         new Commit().write();
         Branch.commitList();
+        String[] commitKey = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + "testCommitHistory").split("\n");
+        String firstCommitKey = commitKey[0];
+        Branch.resetVersion(firstCommitKey);
 
+        File[] file = new File("../workspace").listFiles();
+        File ddd = file[0];
+        File dddd = new File("../ddd/ddd.txt");
+        if (dddd.getName().equals(ddd.getName())){
+            System.out.println("回滚成功");
+        }
+        else {
+            System.out.println("回滚失败");
+        }
     }
 
     /**
@@ -36,7 +58,7 @@ public class UnitTest_resetVersion {
         for(File fi:allf) {
             try {
                 //拼接目标位置
-                String URL = target+fi.getAbsolutePath().substring("/Users/chenjiangyuan/软工课程资料/Java/作业/github/aaa".length());
+                String URL = target+fi.getAbsolutePath().substring(fi.getAbsolutePath().length() - 8);
 
                 //创建目录或文件
                 if(fi.isDirectory()) {

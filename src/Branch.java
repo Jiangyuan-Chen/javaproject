@@ -61,7 +61,7 @@ public class Branch extends GitObject{
                 String branchCommitKey = KeyValueStore.readFileString(new File("Branch").getAbsolutePath() + File.separator + branch);
                 // 如果切换前的分支有提交过commit，则把这些记录写入新分支的记录中
                 if (!"None".equals(branchCommitKey)){
-                    outputStream.write((branchCommitKey + "/n").getBytes());
+                    outputStream.write((branchCommitKey + "\n").getBytes());
                 }
             } catch (FileNotFoundException ignored){}
         }
