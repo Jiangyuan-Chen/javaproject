@@ -3,6 +3,9 @@ import java.util.Objects;
 import java.util.Scanner;
 
 
+/**
+ * @author chenjiangyuan
+ */
 public class UnitTest2 {
     public static void main(String[] args) throws Exception {
         System.out.print("请输入要被转化的文件夹目录：");

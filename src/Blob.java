@@ -1,6 +1,9 @@
 import java.io.File;
 
 
+/**
+ * @author chenjiangyuan
+ */
 public class Blob extends GitObject{
 
     public Blob(String filePath) throws Exception {

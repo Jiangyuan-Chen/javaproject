@@ -3,6 +3,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 
+/**
+ * @author chenjiangyuan
+ */
 public class Commit extends GitObject{
 
     private Tree workTree;
@@ -29,15 +32,17 @@ public class Commit extends GitObject{
     public void write() throws Exception {
         // 默认GitObjects存放在工作目录
         String newTreeKey = "";
-            try {
-                // 最新commit的key
-                String HEAD = KeyValueStore.readFileString("HEAD");
-                // 取出最新commit上传的tree name
-                String value = KeyValueStore.readFileString(HEAD);
-                String[] v = value.split(" |\n");
-                newTreeKey = v[1];
+        // 第一次commit时读不出上次commit的key
+        try {
+            // 上一次commit的key
+            String HEAD = KeyValueStore.readFileString("HEAD");
+            // 取出上一次commit上传的tree name
+            String value = KeyValueStore.readFileString(HEAD);
+            String[] v = value.split(" |\n");
+            newTreeKey = v[1];
             } catch (FileNotFoundException ignored){}
-        if (workTree.getName().equals(newTreeKey)) {
+        // 如果文件夹工作区的哈希值相同，则说明新旧commit的内容相同，commit不能写出
+            if (workTree.getName().equals(newTreeKey)) {
             System.out.println("tree相同，commit生成失败");
         }
         else {
@@ -58,8 +63,6 @@ public class Commit extends GitObject{
                 outputStream.write((getName() + "\n").getBytes());
             }
         }
-
-
     }
 
     public void setWorkTree(Tree workTree) {
@@ -72,6 +75,7 @@ public class Commit extends GitObject{
 
     /**
      * 存放最新commit的key
+     * @throws Exception 方法write会抛出IOException
      */
     private void writeHEAD() throws Exception {
         try (FileOutputStream outputStream = new FileOutputStream("HEAD"))

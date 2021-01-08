@@ -3,15 +3,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+
+/**
+ * @author chenjiangyuan
+ */
 public class UnitTest_resetVersion {
 
     //目标路径
     public static String target = "/Users/chenjiangyuan/软工课程资料/Java/作业/github/workspace";
 
-    /**
-     * 主函数
-     * @param args
-     */
     public static void main(String[] args) throws Exception {
         new Branch("main").write();
         Clone("/Users/chenjiangyuan/软工课程资料/Java/作业/github/aaa");
@@ -84,8 +84,6 @@ public class UnitTest_resetVersion {
 
     /**
      * 创建目录
-     * @param name
-     * @return
      */
     public static boolean Createflies(String name) {
         boolean flag=false;

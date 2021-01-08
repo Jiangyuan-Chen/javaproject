@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+/**
+ * @author futongyao
+ * @author chenjiangyuan
+ */
 public class Command {
 
     public static void main(String[] args) throws Exception {
@@ -59,7 +63,7 @@ public class Command {
 
             // 退出操作命令为kdg quit
             else if (v[0].equals("kdg")&&v[1].equals("quit")) {
-                    return;
+                return;
             }
 
             else {

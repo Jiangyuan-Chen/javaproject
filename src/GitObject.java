@@ -1,5 +1,8 @@
 import java.io.File;
 
+/**
+ * @author chenjiangyuan
+ */
 public abstract class GitObject {
 
     private String name;
