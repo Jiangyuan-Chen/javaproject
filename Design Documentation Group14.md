@@ -195,3 +195,15 @@
     - treePath 文件夹Object的绝对路径
     - tempTreeKey 被引用的commit所对应的根目录的tree key
     - tempObjectName 存放这些commit key所对应的Object Name的容器ArrayList
+    
+    #### Command类
+
+- 实现命令行交互
+- 操作指令：
+  - kdg branch [branchname]：新建分支到[branchname]
+  - kdg switch [branchname]：切换分支到[branchname]
+  - kdg switch -c [branchname]：新建并切换到分支[branchname]
+  - kdg commit：对当前workspace内容进行commit
+  - kdg log：查询当前分支commit历史
+  - kdg reset [resetkey]：回滚，resetkey为要回滚到的commit key，实现了删除workspace里的实体文件以及Objects里对应的keyvalue形式存储的文件
+  - kdg quit：结束操作
