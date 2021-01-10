@@ -33,8 +33,8 @@
        
        - KeyValueStore(File file)
        - KeyValueStore(String name, File file)
-    - KeyValueStore(String value)
-    - KeyValueStore(String name, String value)
+       - KeyValueStore(String value)
+       - KeyValueStore(String name, String value)
     
   - ##### writeFile()方法：
     
@@ -113,7 +113,7 @@
        - 更新文件夹Branch里当前分支的指针，令其存储本次最新的Commit Key
        - 把工作区的文件转化为Blob和Tree存入文件夹Objects
        - 把本次Commit的Key写入当前分支的CommitHistory里
-  - ##### writeHEAD方法：
+  - ##### writeHEAD()方法：
     
     - 生成HEAD文件，内容为当前最新Commit的Key
 
