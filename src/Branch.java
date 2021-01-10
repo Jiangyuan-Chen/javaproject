@@ -108,7 +108,7 @@ public class Branch extends GitObject{
     /**
      * 把切换后分支的文件内容写进工作区
      *
-     * @param treePath 文件夹Object的绝对路径
+     * @param treePath 文件夹Objects的绝对路径
      * @param treeKey 切换后分支最新的commit里根目录的key开始往下递归
      * @param path 写文件的目录从工作区目录开始往下递归
      * @throws Exception readFileString()可能会抛出FileNotFoundException
