@@ -23,7 +23,7 @@
 - #### GitObject抽象类（为Tree、Blob、Commit、Branch类的父类）
   
   - 数据域：String name、value、file
-  - 抽象方法：setName、setValue、setFile、getName、getValue、getFile、write
+  - 抽象方法：setName()、setValue()、setFile()、getName()、getValue()、getFile()、write()
 
 
 
